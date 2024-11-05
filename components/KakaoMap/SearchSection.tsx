@@ -1,29 +1,30 @@
-// import { HomeIcon } from "@radix-ui/react-icons";
+import { HomeIcon } from "@radix-ui/react-icons";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { MarkersItem } from "@/types/KakaoMapTypes";
 import { Button } from "../ui/button";
 
 type Props = {
-  onMarkersUpdate: (_markers: Array<MarkersItem>) => void;
+  onMarkersUpdate: (_markers: kakao.maps.services.PlacesSearchResult) => void;
 };
 
 export default function SearchSection({ onMarkersUpdate }: Props) {
+  const [searchResultList, setSearchResultList] =
+    useState<kakao.maps.services.PlacesSearchResult>([]);
   const { register, handleSubmit } = useForm<{ keyword: string }>();
 
-  const onHandleSubmit = (data: { keyword: string }) => {
-    if (!data) {
+  const onHandleSubmit = ({ keyword }: { keyword: string }) => {
+    if (!keyword) {
       return;
     }
 
     const ps = new window.kakao.maps.services.Places();
 
     // 키워드로 장소를 검색합니다
-    ps.keywordSearch(data.keyword, (data, status) => {
-      console.log(data);
-
+    ps.keywordSearch(keyword, (data, status) => {
       if (status === window.kakao.maps.services.Status.OK) {
-        onMarkersUpdate([]);
+        onMarkersUpdate(data);
+        setSearchResultList(data);
       }
     });
   };
@@ -43,7 +44,7 @@ export default function SearchSection({ onMarkersUpdate }: Props) {
       <hr className="my-4" />
 
       <ul className="flex h-full flex-col gap-2 overflow-y-auto rounded border">
-        {/* {searchResultList?.map((item) => (
+        {searchResultList?.map((item) => (
           <li
             className="flex cursor-default items-center justify-between p-2 transition-all hover:bg-gray-200"
             key={item.id}
@@ -60,7 +61,7 @@ export default function SearchSection({ onMarkersUpdate }: Props) {
               <HomeIcon color="#222222" />
             </a>
           </li>
-        ))} */}
+        ))}
       </ul>
     </div>
   );

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { Map, useKakaoLoader } from "react-kakao-maps-sdk";
+import { Map, MapMarker, useKakaoLoader } from "react-kakao-maps-sdk";
 
 import useGeolocation from "@/hooks/useGeolocation";
-import { MarkersItem } from "@/types/KakaoMapTypes";
 import SearchSection from "./SearchSection";
 
 export default function KakaoMap() {
-  const [markers, setMarkers] = useState<Array<MarkersItem> | null>(null);
+  const [markers, setMarkers] =
+    useState<kakao.maps.services.PlacesSearchResult | null>(null);
   const [map, setMap] = useState<kakao.maps.Map>();
 
   const [geolocation] = useGeolocation();
@@ -15,14 +15,11 @@ export default function KakaoMap() {
     libraries: ["services"],
   });
 
-  const markersUpdate = (_markers: Array<MarkersItem>) => {
+  const markersUpdate = (_markers: kakao.maps.services.PlacesSearchResult) => {
     if (!map) return;
-
-    console.log(_markers);
 
     setMarkers(_markers);
 
-    console.log(markers);
     // map.setBounds()
   };
 
@@ -91,7 +88,14 @@ export default function KakaoMap() {
           }}
           level={3}
           onCreate={(map) => setMap(map)}
-        />
+        >
+          {markers?.map((marker) => (
+            <MapMarker
+              key={`${marker.id}-${marker.x}-${marker.y}`}
+              position={{ lat: Number(marker.y), lng: Number(marker.x) }}
+            />
+          ))}
+        </Map>
       )}
 
       <SearchSection onMarkersUpdate={markersUpdate} />
