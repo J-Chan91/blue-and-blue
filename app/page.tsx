@@ -1,11 +1,16 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
+import KakaoMap from "@/components/KakaoMap";
+import useGeolocation from "@/hooks/useGeolocation";
 
 export default function Home() {
-  return (
-    <main className="px-72">
-      <p>Shopping Mall </p>
+  const [geolocation] = useGeolocation();
 
-      <Button></Button>
+  return (
+    <main className="px-14 py-4">
+      <div>
+        <KakaoMap geolocation={geolocation} />
+      </div>
     </main>
   );
 }
