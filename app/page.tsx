@@ -1,16 +1,11 @@
 "use client";
 
 import KakaoMap from "@/components/KakaoMap";
-import useGeolocation from "@/hooks/useGeolocation";
 
 export default function Home() {
-  const [geolocation] = useGeolocation();
-
   return (
-    <main className="px-14 py-4">
-      <div>
-        <KakaoMap geolocation={geolocation} />
-      </div>
+    <main className="h-[calc(100%-92px)] bg-violet-400 p-6">
+      <KakaoMap />
     </main>
   );
 }
