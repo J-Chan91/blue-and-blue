@@ -21,7 +21,7 @@ export default function SearchSection({
 
   const debounceValue = useDebounce<{ lat: number; lng: number } | null>(
     geolocation,
-    2000,
+    1000,
   );
   const { register, handleSubmit, getValues } = useForm<{ keyword: string }>();
 
@@ -33,7 +33,6 @@ export default function SearchSection({
     const ps = new window.kakao.maps.services.Places();
     const location = new kakao.maps.LatLng(geolocation.lat, geolocation.lng);
 
-    // 키워드로 장소를 검색합니다
     ps.keywordSearch(
       keyword,
       (data, status) => {
@@ -44,7 +43,7 @@ export default function SearchSection({
       },
       {
         location,
-        radius: zoomLevel * 1500,
+        radius: zoomLevel * 500,
       },
     );
   };
