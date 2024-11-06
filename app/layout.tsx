@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 
 import "./globals.css";
 import NavBar from "@/components/NavBar";
+import Script from "next/script";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,6 +34,11 @@ export default function RootLayout({
         <NavBar />
 
         {children}
+
+        <Script
+          src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2450696ea560c23ccf7112c36158d312&libraries=services,clusterer&autoload=false"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );

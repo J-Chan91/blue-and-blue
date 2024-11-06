@@ -1,33 +1,65 @@
 import { HomeIcon } from "@radix-ui/react-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import useDebounce from "@/hooks/useDebounce";
 import { Button } from "../ui/button";
 
 type Props = {
+  geolocation: { lat: number; lng: number } | null;
+  zoomLevel: number;
   onMarkersUpdate: (_markers: kakao.maps.services.PlacesSearchResult) => void;
 };
 
-export default function SearchSection({ onMarkersUpdate }: Props) {
+export default function SearchSection({
+  geolocation,
+  zoomLevel,
+  onMarkersUpdate,
+}: Props) {
   const [searchResultList, setSearchResultList] =
     useState<kakao.maps.services.PlacesSearchResult>([]);
-  const { register, handleSubmit } = useForm<{ keyword: string }>();
+
+  const debounceValue = useDebounce<{ lat: number; lng: number } | null>(
+    geolocation,
+    2000,
+  );
+  const { register, handleSubmit, getValues } = useForm<{ keyword: string }>();
 
   const onHandleSubmit = ({ keyword }: { keyword: string }) => {
-    if (!keyword) {
+    if (!keyword || !geolocation) {
       return;
     }
 
     const ps = new window.kakao.maps.services.Places();
+    const location = new kakao.maps.LatLng(geolocation.lat, geolocation.lng);
 
     // 키워드로 장소를 검색합니다
-    ps.keywordSearch(keyword, (data, status) => {
-      if (status === window.kakao.maps.services.Status.OK) {
-        onMarkersUpdate(data);
-        setSearchResultList(data);
-      }
-    });
+    ps.keywordSearch(
+      keyword,
+      (data, status) => {
+        if (status === window.kakao.maps.services.Status.OK) {
+          onMarkersUpdate(data);
+          setSearchResultList(data);
+        }
+      },
+      {
+        location,
+        radius: zoomLevel * 1500,
+      },
+    );
   };
+
+  useEffect(() => {
+    const keyword = getValues("keyword");
+
+    if (!keyword) {
+      return;
+    }
+
+    console.log("updated debounce", keyword);
+
+    onHandleSubmit({ keyword });
+  }, [debounceValue]);
 
   return (
     <div className="flex w-1/2 flex-col px-4 max-md:h-full max-md:w-full">
