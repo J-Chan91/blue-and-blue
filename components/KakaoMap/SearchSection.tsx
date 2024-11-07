@@ -4,17 +4,22 @@ import { useForm } from "react-hook-form";
 
 import useDebounce from "@/hooks/useDebounce";
 import { Button } from "../ui/button";
+import { cn } from "@/lib/utils";
 
 type Props = {
   geolocation: { lat: number; lng: number } | null;
+  targetMarker: kakao.maps.services.PlacesSearchResultItem | null;
   zoomLevel: number;
+  onMarkerSelect: (_marker: kakao.maps.services.PlacesSearchResultItem) => void;
   onMarkersUpdate: (_markers: kakao.maps.services.PlacesSearchResult) => void;
 };
 
 export default function SearchSection({
   geolocation,
+  targetMarker,
   zoomLevel,
   onMarkersUpdate,
+  onMarkerSelect,
 }: Props) {
   const [searchResultList, setSearchResultList] =
     useState<kakao.maps.services.PlacesSearchResult>([]);
@@ -55,8 +60,6 @@ export default function SearchSection({
       return;
     }
 
-    console.log("updated debounce", keyword);
-
     onHandleSubmit({ keyword });
   }, [debounceValue]);
 
@@ -77,14 +80,20 @@ export default function SearchSection({
       <ul className="flex h-full flex-col gap-2 overflow-y-auto rounded border">
         {searchResultList?.map((item) => (
           <li
-            className="flex cursor-default items-center justify-between p-2 transition-all hover:bg-gray-200"
+            className={cn(
+              "flex cursor-default items-center justify-between p-2 transition-all hover:bg-gray-200",
+              targetMarker?.id === item.id ? "bg-blue-200" : null,
+            )}
             key={item.id}
+            onClick={() => onMarkerSelect(item)}
           >
             <div className="flex flex-col">
               <span className="text-sm">{item.place_name}</span>
 
               <span className="text-xs text-gray-400">
-                {item.road_address_name}
+                {!item.road_address_name
+                  ? item.address_name
+                  : item.road_address_name}
               </span>
             </div>
 

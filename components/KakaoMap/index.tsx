@@ -5,12 +5,16 @@ import useGeolocation from "@/hooks/useGeolocation";
 import useKakaoMapLayout from "@/hooks/useKakaoMapLayout";
 import { cn } from "@/lib/utils";
 import SearchSection from "./SearchSection";
+import ReLayoutButton from "./ReLayoutButton";
 
 export default function KakaoMap() {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isShowReLayoutButton, setIsShowReLayoutButton] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(3);
   const [markers, setMarkers] =
     useState<kakao.maps.services.PlacesSearchResult | null>(null);
+  const [targetMarker, setTargetMarker] =
+    useState<kakao.maps.services.PlacesSearchResultItem | null>(null);
   const [map, setMap] = useState<kakao.maps.Map>();
 
   const [geolocation, geoLocationUpdate] = useGeolocation();
@@ -20,37 +24,59 @@ export default function KakaoMap() {
     if (!map) return;
 
     setMarkers(_markers);
+  };
 
-    // map.setBounds()
+  const markerSelect = (marker: kakao.maps.services.PlacesSearchResultItem) => {
+    setTargetMarker(marker);
   };
 
   const mapResize = () => {
     setIsExpanded(!isExpanded);
   };
 
-  const zoomChange = (zoom: kakao.maps.Map) => {
-    setZoomLevel(zoom.getLevel());
-  };
+  const layoutUpdate = () => {
+    const map = mapRef.current;
 
-  const centerChange = (map: kakao.maps.Map) => {
+    if (!map) return;
+
     geoLocationUpdate({
       lat: map.getCenter().getLat(),
       lng: map.getCenter().getLng(),
     });
+    setIsShowReLayoutButton(false);
+  };
+
+  const zoomChange = (zoom: kakao.maps.Map) => {
+    if (!markers?.length) return;
+
+    setZoomLevel(zoom.getLevel());
+  };
+
+  const centerChange = () => {
+    if (!markers?.length) return;
+
+    setIsShowReLayoutButton(true);
   };
 
   useEffect(() => {
     resizeUpdate();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isExpanded]);
 
   return (
-    <div className="flex h-full gap-4 max-md:flex-col">
+    <div className="flex h-full gap-1 max-md:flex-col">
       {geolocation && (
-        <div className="relative h-full w-full overflow-hidden rounded-xl">
+        <div
+          className={cn(
+            "relative w-full overflow-hidden rounded-xl",
+            isExpanded ? "h-full" : "h-[520px]",
+          )}
+        >
           <Map
             ref={mapRef}
             id="kakao-map-container"
-            className="relative overflow-hidden rounded-xl shadow-lg"
+            className="overflow-hidden rounded-xl shadow-lg"
             center={{
               lat: geolocation.lat,
               lng: geolocation.lng,
@@ -62,26 +88,34 @@ export default function KakaoMap() {
             level={zoomLevel}
             onCreate={(map) => setMap(map)}
             onZoomChanged={zoomChange}
-            onTileLoaded={centerChange}
+            onDragEnd={centerChange}
           >
             {markers?.map((marker) => (
               <MapMarker
+                image={
+                  marker.id === targetMarker?.id
+                    ? SELECT_ICON_INFO
+                    : DEFAULT_ICON_INFO
+                }
                 key={`${marker.id}-${marker.x}-${marker.y}`}
                 position={{ lat: Number(marker.y), lng: Number(marker.x) }}
+                onClick={() => markerSelect(marker)}
               />
             ))}
           </Map>
 
+          {!!markers?.length && isShowReLayoutButton && (
+            <ReLayoutButton onLayoutUpdate={layoutUpdate} />
+          )}
+
           <svg
             className={cn(
-              "absolute right-1 z-10 cursor-pointer rounded-full bg-white text-gray-800",
-              isExpanded ? "bottom-1" : "bottom-110",
+              "absolute bottom-1 right-1 z-10 cursor-pointer rounded-full bg-white text-gray-800",
             )}
             width="24"
             height="24"
             viewBox="0 0 15 15"
             fill="none"
-            xmlns="http://www.w3.org/2000/svg"
             onClick={mapResize}
           >
             <path
@@ -89,7 +123,7 @@ export default function KakaoMap() {
               fill="currentColor"
               fillRule="evenodd"
               clipRule="evenodd"
-            ></path>
+            />
           </svg>
         </div>
       )}
@@ -97,8 +131,38 @@ export default function KakaoMap() {
       <SearchSection
         geolocation={geolocation}
         zoomLevel={zoomLevel}
+        targetMarker={targetMarker}
         onMarkersUpdate={markersUpdate}
+        onMarkerSelect={markerSelect}
       />
     </div>
   );
 }
+
+const SELECT_ICON_INFO = {
+  src: "https://uxwing.com/wp-content/themes/uxwing/download/fitness-gym-yoga-spa/healthy-food-icon.png",
+  size: {
+    width: 40,
+    height: 40,
+  },
+  options: {
+    offset: {
+      x: 20,
+      y: 44,
+    },
+  },
+};
+
+const DEFAULT_ICON_INFO = {
+  src: "https://e7.pngegg.com/pngimages/710/222/png-clipart-restaurant-computer-icons-food-resturant-miscellaneous-cdr.png",
+  size: {
+    width: 36,
+    height: 36,
+  },
+  options: {
+    offset: {
+      x: 17,
+      y: 50,
+    },
+  },
+};
