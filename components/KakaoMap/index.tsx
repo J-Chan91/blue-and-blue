@@ -65,12 +65,12 @@ export default function KakaoMap() {
   }, [isExpanded]);
 
   return (
-    <div className="grid h-full w-full grid-cols-2 gap-1 max-md:flex-col">
+    <div className="grid h-full w-full grid-cols-2 grid-rows-2 gap-1 max-md:flex-col">
       {geolocation && (
         <div
           className={cn(
             "relative h-full w-full overflow-hidden rounded-xl",
-            isExpanded ? "row-span-2" : "col-span-2",
+            isExpanded ? "row-span-2" : "row-span-1",
           )}
         >
           <Map
@@ -137,8 +137,13 @@ export default function KakaoMap() {
         onMarkerSelect={markerSelect}
       />
 
-      <div className="row-span-1 flex h-full items-center justify-center rounded-md border shadow-md">
-        INFO
+      <div
+        className={cn(
+          "flex h-[100%] flex-1 items-center justify-center rounded-md border shadow-md",
+          isExpanded ? "row-span-1" : "row-span-1",
+        )}
+      >
+        <p className="tracking-tighter text-gray-800">검색결과</p>
       </div>
     </div>
   );
