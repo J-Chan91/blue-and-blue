@@ -7,6 +7,7 @@ import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
 
 type Props = {
+  isExpanded: boolean;
   geolocation: { lat: number; lng: number } | null;
   targetMarker: kakao.maps.services.PlacesSearchResultItem | null;
   zoomLevel: number;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export default function SearchSection({
+  isExpanded,
   geolocation,
   targetMarker,
   zoomLevel,
@@ -48,7 +50,7 @@ export default function SearchSection({
       },
       {
         location,
-        radius: zoomLevel * 500,
+        radius: zoomLevel * 100,
       },
     );
   };
@@ -61,10 +63,17 @@ export default function SearchSection({
     }
 
     onHandleSubmit({ keyword });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debounceValue]);
 
   return (
-    <div className="flex w-1/2 flex-col px-4 max-md:h-full max-md:w-full">
+    <div
+      className={cn(
+        "flex w-full flex-col gap-2 overflow-y-auto",
+        isExpanded ? "row-span-1" : "row-span-2",
+      )}
+    >
       <form className="flex gap-2" onSubmit={handleSubmit(onHandleSubmit)}>
         <input
           className="w-full rounded-md border border-gray-400 px-4 py-1 text-sm"
@@ -74,8 +83,6 @@ export default function SearchSection({
 
         <Button type="submit">검색</Button>
       </form>
-
-      <hr className="my-4" />
 
       <ul className="flex h-full flex-col gap-2 overflow-y-auto rounded border">
         {searchResultList?.map((item) => (

@@ -65,12 +65,12 @@ export default function KakaoMap() {
   }, [isExpanded]);
 
   return (
-    <div className="flex h-full gap-1 max-md:flex-col">
+    <div className="grid h-full w-full grid-cols-2 gap-1 max-md:flex-col">
       {geolocation && (
         <div
           className={cn(
-            "relative w-full overflow-hidden rounded-xl",
-            isExpanded ? "h-full" : "h-[520px]",
+            "relative h-full w-full overflow-hidden rounded-xl",
+            isExpanded ? "row-span-2" : "col-span-2",
           )}
         >
           <Map
@@ -83,7 +83,7 @@ export default function KakaoMap() {
             }}
             style={{
               width: "100%",
-              height: isExpanded ? "100%" : "520px",
+              height: "100%",
             }}
             level={zoomLevel}
             onCreate={(map) => setMap(map)}
@@ -110,7 +110,7 @@ export default function KakaoMap() {
 
           <svg
             className={cn(
-              "absolute bottom-1 right-1 z-10 cursor-pointer rounded-full bg-white text-gray-800",
+              "absolute bottom-1 right-1 z-10 cursor-pointer rounded-full bg-white text-gray-800 hover:bg-gray-200",
             )}
             width="24"
             height="24"
@@ -129,12 +129,17 @@ export default function KakaoMap() {
       )}
 
       <SearchSection
+        isExpanded={isExpanded}
         geolocation={geolocation}
         zoomLevel={zoomLevel}
         targetMarker={targetMarker}
         onMarkersUpdate={markersUpdate}
         onMarkerSelect={markerSelect}
       />
+
+      <div className="row-span-1 flex h-full items-center justify-center rounded-md border shadow-md">
+        INFO
+      </div>
     </div>
   );
 }
