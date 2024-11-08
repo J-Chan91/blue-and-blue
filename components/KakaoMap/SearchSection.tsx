@@ -84,7 +84,7 @@ export default function SearchSection({
         <Button type="submit">검색</Button>
       </form>
 
-      <ul className="flex h-full flex-col gap-2 overflow-y-auto rounded border">
+      <ul className="flex h-full flex-col gap-2 overflow-y-auto rounded border [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-500 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-700 [&::-webkit-scrollbar]:w-2">
         {searchResultList?.map((item) => (
           <li
             className={cn(

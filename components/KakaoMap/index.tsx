@@ -143,7 +143,7 @@ export default function KakaoMap() {
           isExpanded ? "row-span-1" : "row-span-1",
         )}
       >
-        <p className="tracking-tighter text-gray-800">검색결과</p>
+        <p className="tracking-tighter text-gray-800"></p>
       </div>
     </div>
   );
