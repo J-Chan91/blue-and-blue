@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import { createUser } from "@/app/(auth)/_action/createUser";
 
 const initState = {
+  target: "",
   message: "",
 };
 
 export default function Home() {
   const [state, formAction] = useFormState(createUser, initState);
-
-  console.log(state);
 
   return (
     <main className="flex h-full items-center justify-center">
@@ -56,7 +55,7 @@ export default function Home() {
             </label>
 
             <div className="h-6">
-              {state.message && (
+              {state.target && (
                 <span className="text-sm text-red-500">{state.message}</span>
               )}
             </div>
