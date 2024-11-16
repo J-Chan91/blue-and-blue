@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { createUser } from "@/app/(auth)/_action/createUser";
 
 const initState = {
-  target: "",
   message: "",
 };
 
@@ -55,7 +54,7 @@ export default function Home() {
             </label>
 
             <div className="h-6">
-              {state.target && (
+              {state.message && (
                 <span className="text-sm text-red-500">{state.message}</span>
               )}
             </div>
