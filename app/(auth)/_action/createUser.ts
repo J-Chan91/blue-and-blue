@@ -1,7 +1,6 @@
 "use server";
 
-import CryptoJS from "crypto-js";
-import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function createUser(prevState: any, formData: FormData) {
   const userId = formData.get("userId") as string;
@@ -21,10 +20,5 @@ export async function createUser(prevState: any, formData: FormData) {
     };
   }
 
-  const cookieStore = await cookies();
-  const encryptedToken = CryptoJS.SHA256("dadd").toString();
-
-  cookieStore.set("token", encryptedToken);
-
-  return { target: "", message: "" };
+  return redirect("/login");
 }
