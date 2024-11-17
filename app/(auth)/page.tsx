@@ -54,7 +54,7 @@ export default function Home() {
             </label>
 
             <div className="h-6">
-              {state.message && (
+              {state?.message && (
                 <span className="text-sm text-red-500">{state.message}</span>
               )}
             </div>

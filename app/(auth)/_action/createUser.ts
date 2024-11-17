@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import bcrypt from "bcrypt";
 
@@ -18,7 +19,7 @@ export async function createUser(prevState: any, formData: FormData) {
   const userPassword = formData.get("userPassword") as string;
 
   if (!pattern.id.test(userId)) {
-    return { target: "userId", message: ERROR_MESSAGES.INVALID_ID };
+    return { message: ERROR_MESSAGES.INVALID_ID };
   }
 
   if (!pattern.password.test(userPassword)) {
@@ -28,19 +29,12 @@ export async function createUser(prevState: any, formData: FormData) {
   const hashedPassword = await bcrypt.hash(userPassword, SALT_ROUNDS);
 
   try {
-    const newUser = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name: userId,
         password: hashedPassword,
       },
     });
-
-    console.log(newUser);
-
-    return {
-      target: "",
-      message: "",
-    };
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
       if (err.code === "P2002") {
@@ -53,5 +47,5 @@ export async function createUser(prevState: any, formData: FormData) {
     }
   }
 
-  return { message: "사용자 생성 중 오류가 발생했습니다" };
+  redirect("login");
 }
