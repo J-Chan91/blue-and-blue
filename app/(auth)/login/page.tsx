@@ -1,22 +1,31 @@
 "use client";
 
 import { useFormState } from "react-dom";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { createUser } from "@/app/(auth)/_action/createUser";
+import { loginUser } from "@/app/(auth)/_action/loginUser";
 
 const initState = {
   message: "",
 };
 
 export default function Home() {
-  const [state, formAction] = useFormState(createUser, initState);
+  const router = useRouter();
+  const [state, formAction] = useFormState(loginUser, initState);
+
+  if (state.message === "success") {
+    router.push("/");
+
+    return "";
+  }
 
   return (
     <main className="flex h-full items-center justify-center">
-      <div className="flex w-[520px] flex-col">
+      <div className="flex w-[520px] flex-col gap-2">
         <div className="mb-2 flex items-center gap-2">
-          <h2 className="text-nowrap text-xl font-semibold">회원가입</h2>
+          <h2 className="text-nowrap text-xl font-semibold">로그인</h2>
 
           <hr className="w-full border-gray-400" />
         </div>
@@ -60,8 +69,15 @@ export default function Home() {
             </div>
           </div>
 
-          <Button type="submit">회원가입</Button>
+          <Button type="submit">로그인</Button>
         </form>
+
+        <Link
+          className="mt-1 flex h-9 w-full items-center justify-center text-center align-middle text-sm underline underline-offset-2 hover:font-semibold"
+          href="/register"
+        >
+          회원가입
+        </Link>
       </div>
     </main>
   );
